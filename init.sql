@@ -1,0 +1,5 @@
+CREATE DATABASE IF NOT EXISTS users_db;
+CREATE DATABASE IF NOT EXISTS products_db;
+GRANT ALL PRIVILEGES ON users_db.* TO 'appuser'@'%';
+GRANT ALL PRIVILEGES ON products_db.* TO 'appuser'@'%';
+FLUSH PRIVILEGES;
