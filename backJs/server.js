@@ -16,12 +16,15 @@ let db;
 
 async function initDB() {
     try {
-        db = await mysql.createConnection({
+        db = mysql.createPool({
             host: process.env.DB_HOST,
             port: process.env.DB_PORT,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
+            database: process.env.DB_NAME,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0
         });
         console.log('Connected to MySQL database');
         
@@ -66,7 +69,6 @@ app.post('/api/users/register', async (req, res) => {
             return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
         }
         
-        // Check if username exists
         const [existingUser] = await db.execute(
             'SELECT id FROM users WHERE username = ? OR email = ?',
             [username, email]
@@ -76,7 +78,6 @@ app.post('/api/users/register', async (req, res) => {
             return res.status(400).json({ error: 'El usuario o email ya existe' });
         }
         
-        // Insert user
         const [result] = await db.execute(
             'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
             [username, email, password]
